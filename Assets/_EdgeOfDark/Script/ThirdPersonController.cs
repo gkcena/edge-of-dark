@@ -1,96 +1,134 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class ThirdPersonController : MonoBehaviour
+[DisallowMultipleComponent]
+[RequireComponent(typeof(CharacterController))]
+public class ThirdPersonMoveAndCamera_NewInput : MonoBehaviour
 {
+    [Header("References")]
+    [Tooltip("Main Camera transform (drag Main Camera here).")]
+    public Transform cameraTransform;
+
     [Header("Movement")]
-    [SerializeField] private float moveSpeed = 5f;
-    [SerializeField] private float rotationSpeed = 10f;
+    public float moveSpeed = 5.5f;
+    public float rotationSpeed = 12f;      // character turning speed
+    public float gravity = -20f;
 
     [Header("Camera")]
-    [SerializeField] private Transform cameraPivot;
-    [SerializeField] private float mouseSensitivity = 2f;
-    [SerializeField] private float cameraDistance = 4f;
-    [SerializeField] private float cameraHeight = 2f;
+    public Vector3 cameraOffset = new Vector3(0f, 2.2f, -4.5f);
+    public float mouseSensitivity = 0.12f;
+    public float minPitch = -25f;
+    public float maxPitch = 70f;
+    public float cameraSmooth = 14f;
 
-    private Rigidbody rb;
-    private Vector2 moveInput;
-    private Vector2 lookInput;
-    private float cameraPitch;
+    private CharacterController cc;
+    private Vector3 verticalVelocity;
 
-    private void Awake()
+    private float yaw;
+    private float pitch;
+
+    // Input Actions (no asset needed)
+    private InputAction moveAction;
+    private InputAction lookAction;
+
+    void Awake()
     {
-        rb = GetComponent<Rigidbody>();
-        rb.freezeRotation = true;
+        cc = GetComponent<CharacterController>();
+
+        if (cameraTransform == null && Camera.main != null)
+            cameraTransform = Camera.main.transform;
+
+        // Create actions
+        moveAction = new InputAction("Move", InputActionType.Value);
+        moveAction.AddCompositeBinding("2DVector")
+            .With("Up", "<Keyboard>/w")
+            .With("Down", "<Keyboard>/s")
+            .With("Left", "<Keyboard>/a")
+            .With("Right", "<Keyboard>/d");
+
+        lookAction = new InputAction("Look", InputActionType.Value, "<Mouse>/delta");
     }
 
-    /* ===== INPUT SYSTEM EVENTS ===== */
-
-    public void OnMove(InputAction.CallbackContext context)
+    void OnEnable()
     {
-        moveInput = context.ReadValue<Vector2>();
+        moveAction.Enable();
+        lookAction.Enable();
+
+        // optional: lock cursor for TPS feel
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
-    public void OnLook(InputAction.CallbackContext context)
+    void OnDisable()
     {
-        lookInput = context.ReadValue<Vector2>();
+        moveAction.Disable();
+        lookAction.Disable();
     }
 
-    /* ===== MOVEMENT ===== */
-
-    private void FixedUpdate()
+    void Start()
     {
-        Vector3 camForward = cameraPivot.forward;
-        Vector3 camRight = cameraPivot.right;
+        // initialize yaw from current facing
+        yaw = transform.eulerAngles.y;
+        pitch = 15f;
+    }
 
-        camForward.y = 0;
-        camRight.y = 0;
+    void Update()
+    {
+        if (cameraTransform == null) return;
 
-        camForward.Normalize();
-        camRight.Normalize();
+        HandleLook();
+        HandleMovement();
+        HandleCameraFollow();
+    }
 
-        Vector3 moveDirection =
-            camForward * moveInput.y +
-            camRight * moveInput.x;
+    void HandleLook()
+    {
+        Vector2 look = lookAction.ReadValue<Vector2>();
 
-        if (moveDirection.magnitude > 0.1f)
+        yaw += look.x * mouseSensitivity;
+        pitch -= look.y * mouseSensitivity;
+        pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
+    }
+
+    void HandleMovement()
+    {
+        Vector2 move = moveAction.ReadValue<Vector2>();
+        Vector3 input = new Vector3(move.x, 0f, move.y);
+        input = Vector3.ClampMagnitude(input, 1f);
+
+        // camera-relative directions (based on yaw)
+        Quaternion yawRot = Quaternion.Euler(0f, yaw, 0f);
+        Vector3 moveDir = yawRot * input; // WASD relative to camera yaw
+
+        // gravity
+        if (cc.isGrounded && verticalVelocity.y < 0f)
+            verticalVelocity.y = -2f;
+        verticalVelocity.y += gravity * Time.deltaTime;
+
+        // move
+        Vector3 velocity = moveDir * moveSpeed + Vector3.up * verticalVelocity.y;
+        cc.Move(velocity * Time.deltaTime);
+
+        // rotate character towards move direction (only if moving)
+        if (moveDir.sqrMagnitude > 0.0001f)
         {
-            Quaternion targetRotation =
-                Quaternion.LookRotation(moveDirection);
-
-            transform.rotation = Quaternion.Slerp(
-                transform.rotation,
-                targetRotation,
-                rotationSpeed * Time.fixedDeltaTime
-            );
+            Quaternion targetRot = Quaternion.LookRotation(moveDir, Vector3.up);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
         }
-
-        rb.MovePosition(
-            rb.position + moveDirection * moveSpeed * Time.fixedDeltaTime
-        );
     }
 
-    /* ===== CAMERA ===== */
-
-    private void LateUpdate()
+    void HandleCameraFollow()
     {
-        cameraPitch -= lookInput.y * mouseSensitivity;
-        cameraPitch = Mathf.Clamp(cameraPitch, -35f, 60f);
+        // camera pivot: player position + rotated offset
+        Quaternion camRot = Quaternion.Euler(pitch, yaw, 0f);
+        Vector3 targetPos = transform.position + camRot * cameraOffset;
 
-        cameraPivot.localRotation =
-            Quaternion.Euler(cameraPitch, 0f, 0f);
+        // smooth position
+        cameraTransform.position = Vector3.Lerp(cameraTransform.position, targetPos, cameraSmooth * Time.deltaTime);
 
-        cameraPivot.Rotate(Vector3.up * lookInput.x * mouseSensitivity);
-
-        Vector3 cameraOffset =
-            -cameraPivot.forward * cameraDistance +
-            Vector3.up * cameraHeight;
-
-        Camera.main.transform.position =
-            cameraPivot.position + cameraOffset;
-
-        Camera.main.transform.LookAt(
-            cameraPivot.position + Vector3.up * 1.5f
-        );
+        // look at player (chest height)
+        Vector3 lookTarget = transform.position + Vector3.up * 1.5f;
+        Quaternion targetLook = Quaternion.LookRotation(lookTarget - cameraTransform.position, Vector3.up);
+        cameraTransform.rotation = Quaternion.Slerp(cameraTransform.rotation, targetLook, cameraSmooth * Time.deltaTime);
     }
 }

@@ -28,18 +28,18 @@
             "bindings": [
                 {
                     "name": "",
-                    "id": "d2f78c80-ab57-40d4-b469-9d1a17925e9f",
-                    "path": "",
+                    "id": "35bf370e-19ca-422f-92b4-ba72fcc0c8a4",
+                    "path": "<Mouse>/delta",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Move",
+                    "action": "Look",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "2D Vector",
-                    "id": "de1750ce-6b56-4606-9f32-d8e53d545307",
+                    "id": "f7d12bd3-3e5b-49cf-8f44-be9257eab5cb",
                     "path": "2DVector",
                     "interactions": "",
                     "processors": "",
@@ -50,7 +50,7 @@
                 },
                 {
                     "name": "up",
-                    "id": "3f365c47-4ad4-4768-a3da-b0ab04e0b77c",
+                    "id": "7c196456-cfb6-4709-a948-ec6ee4dd62c8",
                     "path": "<Keyboard>/w",
                     "interactions": "",
                     "processors": "",
@@ -61,7 +61,7 @@
                 },
                 {
                     "name": "down",
-                    "id": "48b48941-c4c4-4d6b-b1d1-bf54efedc397",
+                    "id": "8ddee3dc-5c1a-4cb6-94d0-8463315adb45",
                     "path": "<Keyboard>/s",
                     "interactions": "",
                     "processors": "",
@@ -72,7 +72,7 @@
                 },
                 {
                     "name": "left",
-                    "id": "6d3648e7-1e7b-425c-be20-5476fec0fda9",
+                    "id": "f77f5c3d-9643-4fd5-826e-ca0f1c43f2f6",
                     "path": "<Keyboard>/a",
                     "interactions": "",
                     "processors": "",
@@ -83,7 +83,7 @@
                 },
                 {
                     "name": "right",
-                    "id": "08748827-0600-46cf-886f-335faea37dc3",
+                    "id": "7b26c312-3ebc-44ed-8010-e93fe063a038",
                     "path": "<Keyboard>/d",
                     "interactions": "",
                     "processors": "",
@@ -91,20 +91,26 @@
                     "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": true
-                },
-                {
-                    "name": "",
-                    "id": "35bf370e-19ca-422f-92b4-ba72fcc0c8a4",
-                    "path": "<Mouse>/delta",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Look",
-                    "isComposite": false,
-                    "isPartOfComposite": false
                 }
             ]
         }
     ],
-    "controlSchemes": []
+    "controlSchemes": [
+        {
+            "name": "KeyboardMouse",
+            "bindingGroup": "KeyboardMouse",
+            "devices": [
+                {
+                    "devicePath": "<Keyboard>",
+                    "isOptional": false,
+                    "isOR": false
+                },
+                {
+                    "devicePath": "<Mouse>",
+                    "isOptional": false,
+                    "isOR": false
+                }
+            ]
+        }
+    ]
 }
