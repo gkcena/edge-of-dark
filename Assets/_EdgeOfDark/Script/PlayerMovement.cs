@@ -17,6 +17,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] LayerMask groundLayer;
     [SerializeField] float groundCheckDistance = 0.25f;
 
+    public AudioClip jumpSound;
+
     Rigidbody rb;
     Animator animator;
     bool isGrounded;
@@ -77,6 +79,7 @@ public class PlayerMovement : MonoBehaviour
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
 
             animator.SetTrigger("Jump");
+            SFXManager.Instance.PlaySFX(jumpSound);
         }
     }
 
