@@ -15581,6 +15581,18 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.AudioClip, UnityEngine
       objectReference: {fileID: 0}
+    - target: {fileID: 8966241077527249938, guid: f4c6245b43f0166428c7a049bc59aa24, type: 3}
+      propertyPath: m_UiScaleMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8966241077527249938, guid: f4c6245b43f0166428c7a049bc59aa24, type: 3}
+      propertyPath: m_ReferenceResolution.x
+      value: 1920
+      objectReference: {fileID: 0}
+    - target: {fileID: 8966241077527249938, guid: f4c6245b43f0166428c7a049bc59aa24, type: 3}
+      propertyPath: m_ReferenceResolution.y
+      value: 1080
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 7794823137098020727, guid: f4c6245b43f0166428c7a049bc59aa24, type: 3}
     m_RemovedGameObjects: []
@@ -17222,6 +17234,7 @@ MonoBehaviour:
   exitPanelPrefab: {fileID: 5736800110152966164, guid: 60820e39236ca0e4ba63227540a312e1, type: 3}
   fadeInDuration: 0.5
   fadeOutDuration: 0.5
+  escLock: 1
 --- !u!4 &1904295526 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 428260, guid: 07aee309b023b0a419d9270d23add85f, type: 3}

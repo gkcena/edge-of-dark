@@ -13,9 +13,16 @@ public class CameraOptions : MonoBehaviour
 
     private void Start()
     {
-        fpsButton.image.sprite = openImage;
-        tpsButton.image.sprite = closeImage;
-        GameManager.Instance.currentCameraMode = CameraMode.FirstPerson;
+        if(GameManager.Instance.currentCameraMode == CameraMode.FirstPerson)
+        {
+            fpsButton.image.sprite = openImage;
+            tpsButton.image.sprite = closeImage;
+        }
+        else
+        {
+            fpsButton.image.sprite = closeImage;
+            tpsButton.image.sprite = openImage;
+        }
 
         fpsButton.onClick.AddListener(OnFpsButtonPressed);
         tpsButton.onClick.AddListener(OnTpsButtonPressed);

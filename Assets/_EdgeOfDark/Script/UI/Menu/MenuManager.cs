@@ -67,6 +67,8 @@ public class MenuManager : MonoBehaviour
 
     private void OnPlayButtonPressed()
     {
+        ESCMenuManager.Instance.escLock = false;
+
         foreach (var open in openAfterPlayButton)
         {
             open.SetActive(true);

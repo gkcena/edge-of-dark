@@ -27,6 +27,8 @@ public class ESCMenuManager : MonoBehaviour
     private GameObject currentExitPanel;
     private CanvasGroup canvasGroupExitPanel;
 
+    public bool escLock;
+
     void Awake()
     {
         if (Instance == null)
@@ -51,11 +53,13 @@ public class ESCMenuManager : MonoBehaviour
         resumeButton.onClick.AddListener(OnResumeButtonPressed);
         qualitySettingsButton.onClick.AddListener(OnQualitySettingsButtonPressed);
         exitButton.onClick.AddListener(OnExitButtonPressed);
+
+        escLock = true;
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape) && !escLock)
         {
             ToggleMenu();
         }
