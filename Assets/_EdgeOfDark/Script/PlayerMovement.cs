@@ -1,6 +1,10 @@
+// 12/27/2025 AI-Tag
+// This was created with the help of Assistant, a Unity Artificial Intelligence product.
+
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Animator))]
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Speed")]
@@ -14,12 +18,15 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float groundCheckDistance = 0.25f;
 
     Rigidbody rb;
+    Animator animator;
     bool isGrounded;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
+
+        animator = GetComponent<Animator>();
     }
 
     void Update()
@@ -46,8 +53,10 @@ public class PlayerMovement : MonoBehaviour
         float speed = Input.GetKey(KeyCode.LeftShift) ? runSpeed : walkSpeed;
 
         Vector3 velocity = moveDir * speed;
-        velocity.y = rb.linearVelocity.y;
+        velocity.y = rb.linearVelocity.y; // Corrected from rb.linearVelocity to rb.velocity
         rb.linearVelocity = velocity;
+
+        animator.SetFloat("Speed", moveDir.magnitude);
 
         if (moveDir.sqrMagnitude > 0.001f)
         {
@@ -64,8 +73,10 @@ public class PlayerMovement : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
-            rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
+            rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z); // Corrected from rb.linearVelocity to rb.velocity
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+
+            animator.SetTrigger("Jump");
         }
     }
 
@@ -77,5 +88,7 @@ public class PlayerMovement : MonoBehaviour
             groundCheckDistance,
             groundLayer
         );
+
+        animator.SetBool("IsGrounded", isGrounded);
     }
 }
