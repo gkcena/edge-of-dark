@@ -1,16 +1,37 @@
+using System;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public static GameManager Instance;
+
+    [Header("Camera Mode")]
+    public CameraMode currentCameraMode;
+
+    public Action<CameraMode> OnCameraModeChanged;
+
+    private void Awake()
     {
-        
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    void Start()
     {
-        
+
     }
+
+}
+public enum CameraMode
+{
+    FirstPerson,
+    ThirdPerson
 }

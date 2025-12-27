@@ -14,10 +14,16 @@ public class ThirdPersonCameraRig : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        SetCameraMode(GameManager.Instance.currentCameraMode);
+    }
 
-        Vector3 angles = transform.eulerAngles;
-        yaw = angles.y;
-        pitch = angles.x;
+    private void OnEnable()
+    {
+        GameManager.Instance.OnCameraModeChanged += SetCameraMode;
+    }
+    private void OnDisable()
+    {
+        GameManager.Instance.OnCameraModeChanged -= SetCameraMode;
     }
 
     void LateUpdate()
@@ -35,19 +41,41 @@ public class ThirdPersonCameraRig : MonoBehaviour
 
     [SerializeField] Transform mainCamera;
 
+    public void SetCameraMode(CameraMode mode)
+    {
+        switch (mode)
+        {
+            case CameraMode.FirstPerson:
+                FpsMode();
+                break;
+            case CameraMode.ThirdPerson:
+                TpsMode();
+                break;
+        }
+    }
+
+    public void FpsMode()
+    {
+        mainCamera.localPosition = Vector3.zero;
+    }
+
+    public void TpsMode()
+    {
+        mainCamera.localPosition = new Vector3(0f, 0f, -5f);
+    }
+
     void Update()
     {
         // FPP TEST
         if (Input.GetKeyDown(KeyCode.V))
         {
-            mainCamera.localPosition = Vector3.zero;
+            FpsMode();
         }
 
         // TPP TEST
         if (Input.GetKeyDown(KeyCode.B))
         {
-            mainCamera.localPosition = new Vector3(0f, 0f, -5f);
+            TpsMode();
         }
     }
-
 }
