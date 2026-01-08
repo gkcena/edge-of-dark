@@ -294,7 +294,11 @@ public class PickupInteractor : MonoBehaviour
         heldObject = null;
         heldRb = null;
     }
-
+    public bool IsHoldingSword()
+    {
+        if (heldObject == null) return false;
+        return heldObject.CompareTag("Sword");
+    }
     void OnDisable()
     {
         RestoreHighlight();

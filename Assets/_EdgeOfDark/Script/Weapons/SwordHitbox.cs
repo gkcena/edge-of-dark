@@ -3,36 +3,29 @@ using UnityEngine.UI;
 
 public class SwordHitbox : MonoBehaviour
 {
-    [Header("Damage")]
     public float damageAmount = 0.2f;
-
-    [Header("Debug")]
-    public bool logHits = false;
 
     private bool canDealDamage = false;
     private bool hasHitThisSwing = false;
 
     private void OnTriggerEnter(Collider other)
     {
-        // Pickup sistemi için collider hep açık; bu yüzden hasarı state ile kontrol ediyoruz
+        Debug.Log("SwordHitbox trigger touched: " + other.name);
+
         if (!canDealDamage) return;
         if (hasHitThisSwing) return;
-
         if (!other.CompareTag("Enemy")) return;
 
-        // Enemy child'larındaki Filled Image'ı bul (can bar)
-        Image filledBar = FindFirstFilledImage(other.gameObject);
+        Image filledBar = FindFilledHealthBar(other.transform);
 
         if (filledBar == null)
         {
-            if (logHits) Debug.LogWarning("Enemy üzerinde Filled Image bulunamadı.");
+            Debug.LogWarning("No Filled Image found on enemy!");
             return;
         }
 
         filledBar.fillAmount = Mathf.Clamp01(filledBar.fillAmount - damageAmount);
         hasHitThisSwing = true;
-
-        if (logHits) Debug.Log($"Hit! New fillAmount = {filledBar.fillAmount}");
 
         if (filledBar.fillAmount <= 0f)
         {
@@ -40,30 +33,27 @@ public class SwordHitbox : MonoBehaviour
         }
     }
 
-    // AttackAnimations bunu çağıracak
     public void StartDamageWindow()
     {
         canDealDamage = true;
         hasHitThisSwing = false;
+        Debug.Log("Damage window OPEN");
     }
 
-    // AttackAnimations bunu çağıracak
     public void StopDamageWindow()
     {
         canDealDamage = false;
+        Debug.Log("Damage window CLOSED");
     }
 
-    private Image FindFirstFilledImage(GameObject enemyObj)
+    private Image FindFilledHealthBar(Transform enemy)
     {
-        // Enemy root + child'larındaki tüm Image'ları tarar
-        Image[] images = enemyObj.GetComponentsInChildren<Image>(true);
-
-        foreach (var img in images)
+        Image[] images = enemy.GetComponentsInChildren<Image>(true);
+        foreach (Image img in images)
         {
-            if (img != null && img.type == Image.Type.Filled)
+            if (img.type == Image.Type.Filled)
                 return img;
         }
-
         return null;
     }
 }
