@@ -4,7 +4,8 @@ public class AttackAnimations : MonoBehaviour
 {
     [Header("References")]
     public SwordHitbox swordHitbox;
-    public PickupInteractor pickupInteractor;
+    public PickupInteractor pickupInteractor; 
+    public Animator animator; 
 
     [Header("Fake Attack Window")]
     public float damageWindowSeconds = 0.25f;
@@ -34,14 +35,16 @@ public class AttackAnimations : MonoBehaviour
 
         isAttacking = true;
 
+        // 🎬 Animasyon - YENİ BÖLÜM
+        if (animator != null)
+        {
+            animator.SetTrigger("Attack");
+        }
+
         // 🔊 Ses
         if (swordSwingClip != null)
         {
-            AudioSource.PlayClipAtPoint(
-                swordSwingClip,
-                transform.position,
-                volume
-            );
+            SFXManager.Instance.PlaySFX(swordSwingClip);
         }
 
         swordHitbox.StartDamageWindow();
@@ -54,3 +57,4 @@ public class AttackAnimations : MonoBehaviour
         isAttacking = false;
     }
 }
+
