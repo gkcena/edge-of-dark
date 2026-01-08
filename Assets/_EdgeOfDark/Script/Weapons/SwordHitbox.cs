@@ -29,7 +29,7 @@ public class SwordHitbox : MonoBehaviour
 
         if (filledBar.fillAmount <= 0f)
         {
-            Destroy(other.gameObject);
+            other.gameObject.SetActive(false);
         }
     }
 
