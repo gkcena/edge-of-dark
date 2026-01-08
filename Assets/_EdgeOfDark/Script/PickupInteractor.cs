@@ -23,6 +23,7 @@ public class PickupInteractor : MonoBehaviour
 
     GameObject heldObject;
     Rigidbody heldRb;
+    
 
     void Awake()
     {
@@ -227,6 +228,8 @@ public class PickupInteractor : MonoBehaviour
 
     void PickupObject(GameObject obj, Rigidbody rb)
     {
+        
+
         heldObject = obj;
         heldRb = rb;
 
@@ -238,6 +241,7 @@ public class PickupInteractor : MonoBehaviour
         heldRb.angularVelocity = Vector3.zero;
         heldRb.isKinematic = true;
         heldRb.useGravity = false;
+        
 
         // parent and snap to holdPoint
         switch (heldObject.tag) 
@@ -264,6 +268,7 @@ public class PickupInteractor : MonoBehaviour
 
     void DropHeldObject()
     {
+        
         if (heldObject == null || heldRb == null) return;
 
         // unparent
@@ -272,6 +277,8 @@ public class PickupInteractor : MonoBehaviour
         // enable physics
         heldRb.isKinematic = false;
         heldRb.useGravity = true;
+
+        
 
         // give a small forward impulse so it drops in front of the player
         Vector3 forward = (playerCamera != null) ? playerCamera.transform.forward : transform.forward;
