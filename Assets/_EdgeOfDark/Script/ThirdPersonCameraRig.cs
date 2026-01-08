@@ -6,6 +6,7 @@ public class ThirdPersonCameraRig : MonoBehaviour
     [SerializeField] float mouseSensitivity = 3f;
     [SerializeField] float minPitch = -30f;
     [SerializeField] float maxPitch = 60f;
+    [SerializeField] GameObject playerBody;
 
     float yaw;
     float pitch;
@@ -37,6 +38,7 @@ public class ThirdPersonCameraRig : MonoBehaviour
 
         transform.rotation = Quaternion.Euler(pitch, yaw, 0f);
         transform.position = target.position;
+        playerBody.transform.rotation = Quaternion.Euler(0f, yaw, 0f);
     }
 
     [SerializeField] Transform mainCamera;

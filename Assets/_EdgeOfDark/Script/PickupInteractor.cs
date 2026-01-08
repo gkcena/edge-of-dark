@@ -1,28 +1,20 @@
-// PickupInteractor.cs
-// Handles looking at objects under a parent named "Weapons" (or tagged as "Weapons");
-// highlights them while looked at; press E to teleport the object to `holdPoint` (make kinematic);
-// press Q to drop the held object in front of the player so it falls with physics.
-
 using UnityEngine;
 
 public class PickupInteractor : MonoBehaviour
 {
     [Header("References")]
-    public Camera playerCamera; // if null, Camera.main will be used
-    public Transform holdPoint; // assign: player's hand or camera child
+    public Camera playerCamera;
+    public Transform swordHoldPoint;
+    public Transform ShieldHoldPoint;
+    public Transform staffHoldPoint;
 
     [Header("Interaction")]
     public float maxDistance = 4f;
     public Color highlightColor = Color.yellow;
-    public LayerMask interactLayers = ~0; // which layers to raycast against
+    public LayerMask interactLayers = ~0;
 
     [Header("Debug")]
-    public bool debugMode = false; // show ray and log hits when true
-
-    // Colliders on player and held object to avoid physics interference while holding
-    Collider[] playerColliders;
-    Collider[] heldColliders;
-    bool[] heldCollidersPrevTrigger;
+    public bool debugMode = false;
 
     GameObject highlighted;
     Renderer[] highlightedRenderers;
@@ -35,19 +27,6 @@ public class PickupInteractor : MonoBehaviour
     void Awake()
     {
         if (playerCamera == null) playerCamera = Camera.main;
-
-        // Cache colliders on the player (including inactive children) to ignore collisions with held objects
-        playerColliders = GetComponentsInChildren<Collider>(true);
-
-        if (holdPoint == null && playerCamera != null)
-        {
-            // default hold point roughly in front of camera
-            GameObject hp = new GameObject("HoldPoint");
-            hp.transform.SetParent(playerCamera.transform, false);
-            hp.transform.localPosition = new Vector3(0f, -0.25f, 0.6f);
-            hp.transform.localRotation = Quaternion.identity;
-            holdPoint = hp.transform;
-        }
     }
 
     void Update()
@@ -69,13 +48,11 @@ public class PickupInteractor : MonoBehaviour
 
     void UpdateHighlight()
     {
-        // clear previous highlight if any
         if (highlighted != null && highlighted != heldObject)
         {
             RestoreHighlight();
         }
 
-        // Cast ray from the center of the camera's viewport so it aligns with what's visible on screen
         Ray ray = (playerCamera != null)
             ? playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f))
             : new Ray(transform.position, transform.forward);
@@ -91,16 +68,13 @@ public class PickupInteractor : MonoBehaviour
 
             if (debugMode) Debug.Log($"PickupInteractor: Ray hit '{candidate.name}' tag='{candidate.tag}' root='{candidate.transform.root.name}' distance={hit.distance}");
 
-            // If the object is part of a root named "Weapons" or has tag "Weapons", consider it pickable
             bool isWeaponGroup = false;
             Transform root = candidate.transform.root;
             if (root != null && root.name == "Weapons") isWeaponGroup = true;
-            // safe tag check (avoids CompareTag exception when tag not defined)
-            if (candidate != null && candidate.tag == "Weapons") isWeaponGroup = true;
+            if (candidate != null && (candidate.tag == "Weapons" || candidate.tag == "Sword" || candidate.tag == "Shield" || candidate.tag == "Staff")) isWeaponGroup = true;
 
             if (isWeaponGroup && candidate != heldObject)
             {
-                // set highlight
                 if (highlighted != candidate)
                 {
                     highlighted = candidate;
@@ -215,7 +189,7 @@ public class PickupInteractor : MonoBehaviour
             if (debugMode) Debug.Log($"PickupInteractor: TryPickup hit '{candidate.name}' tag='{candidate.tag}' root='{candidate.transform.root.name}'");
 
             Transform root = candidate.transform.root;
-            bool isWeaponGroup = (root != null && root.name == "Weapons") || (candidate != null && candidate.tag == "Weapons");
+            bool isWeaponGroup = (root != null && root.name == "Weapons") || (candidate != null && (candidate.tag == "Weapons" || candidate.tag == "Sword" || candidate.tag == "Shield" || candidate.tag == "Staff"));
 
             if (!isWeaponGroup)
             {
@@ -266,7 +240,22 @@ public class PickupInteractor : MonoBehaviour
         heldRb.useGravity = false;
 
         // parent and snap to holdPoint
-        heldObject.transform.SetParent(holdPoint);
+        switch (heldObject.tag) 
+        {
+            case "Sword":
+                heldObject.transform.SetParent(swordHoldPoint);
+                break;
+            case "Shield":
+                heldObject.transform.SetParent(ShieldHoldPoint);
+                break;
+            case "Staff":
+                heldObject.transform.SetParent(staffHoldPoint);
+                break;
+            default:
+                heldObject.transform.SetParent(swordHoldPoint);
+                if (debugMode) Debug.LogWarning($"PickupInteractor: Unknown weapon type '{heldObject.name}', defaulting to sword hold point.");
+                break;
+        }
         heldObject.transform.localPosition = Vector3.zero;
         heldObject.transform.localRotation = Quaternion.identity;
 

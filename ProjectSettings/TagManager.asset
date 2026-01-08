@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 3
   tags:
   - Weapons
+  - Sword
+  - Shield
+  - Staff
   layers:
   - Default
   - TransparentFX
@@ -13,8 +16,8 @@ TagManager:
   - Water
   - UI
   - Weapons
-  - 
-  - 
+  - Player
+  - Sword
   - 
   - 
   - 
