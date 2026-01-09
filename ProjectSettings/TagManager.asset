@@ -9,6 +9,7 @@ TagManager:
   - Shield
   - Staff
   - Enemy
+  - Missile
   layers:
   - Default
   - TransparentFX
@@ -19,7 +20,7 @@ TagManager:
   - Weapons
   - Player
   - Sword
-  - 
+  - EnemyMachine
   - 
   - 
   - 
