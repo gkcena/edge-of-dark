@@ -3,7 +3,12 @@ using UnityEngine.UI;
 
 public class SwordHitbox : MonoBehaviour
 {
+    [Header("Damage Settings")]
     public float damageAmount = 0.2f;
+
+    [Header("Sound Effects")]
+    public AudioClip enemyHitSound;
+    public AudioClip enemyDeathSound;
 
     private bool canDealDamage = false;
     private bool hasHitThisSwing = false;
@@ -29,7 +34,66 @@ public class SwordHitbox : MonoBehaviour
 
         if (filledBar.fillAmount <= 0f)
         {
+            TriggerEnemyDeathAnimation(other.gameObject);
+            PlayEnemyDeathSound();
             other.gameObject.SetActive(false);
+        }
+        else
+        {
+            TriggerEnemyHitAnimation(other.gameObject);
+            PlayEnemyHitSound();
+        }
+    }
+
+    private void TriggerEnemyHitAnimation(GameObject enemy)
+    {
+        Animator enemyAnimator = enemy.GetComponent<Animator>();
+        if (enemyAnimator == null)
+        {
+            enemyAnimator = enemy.GetComponentInChildren<Animator>();
+        }
+
+        if (enemyAnimator != null)
+        {
+            enemyAnimator.SetTrigger("GetHit");
+            Debug.Log($"Enemy {enemy.name} hit animation triggered!");
+        }
+        else
+        {
+            Debug.LogWarning($"No Animator found on enemy {enemy.name}");
+        }
+    }
+
+    private void TriggerEnemyDeathAnimation(GameObject enemy)
+    {
+        Animator enemyAnimator = enemy.GetComponent<Animator>();
+        if (enemyAnimator == null)
+        {
+            enemyAnimator = enemy.GetComponentInChildren<Animator>();
+        }
+
+        if (enemyAnimator != null)
+        {
+            enemyAnimator.SetTrigger("Death");
+            Debug.Log($"Enemy {enemy.name} death animation triggered!");
+        }
+    }
+
+    private void PlayEnemyHitSound()
+    {
+        if (enemyHitSound != null && SFXManager.Instance != null)
+        {
+            SFXManager.Instance.PlaySFX(enemyHitSound);
+            Debug.Log("Enemy hit sound played!");
+        }
+    }
+
+    private void PlayEnemyDeathSound()
+    {
+        if (enemyDeathSound != null && SFXManager.Instance != null)
+        {
+            SFXManager.Instance.PlaySFX(enemyDeathSound);
+            Debug.Log("Enemy death sound played!");
         }
     }
 

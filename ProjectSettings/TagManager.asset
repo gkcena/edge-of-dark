@@ -9,7 +9,7 @@ TagManager:
   - Shield
   - Staff
   - Enemy
-  - Missile
+  - Machine
   layers:
   - Default
   - TransparentFX
